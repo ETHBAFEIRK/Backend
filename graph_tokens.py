@@ -1,4 +1,7 @@
 import requests
+import subprocess
+import tkinter as tk
+from PIL import Image, ImageTk
 
 def fetch_rates(url="http://localhost:8080/rates"):
     resp = requests.get(url)
@@ -28,20 +31,33 @@ def build_mermaid_graph(rates):
             mermaid.append(f'    {from_token} --> {to_token}')
     return "\n".join(mermaid)
 
+def render_mermaid(input_path: str, output_path: str):
+    subprocess.run([
+        "mmdc",
+        "-i", input_path,
+        "-o", output_path,
+        "-b", "white"
+    ], check=True)
+
+def show_image(path: str):
+    root = tk.Tk()
+    img = Image.open(path)
+    tk_img = ImageTk.PhotoImage(img)
+    label = tk.Label(root, image=tk_img)
+    label.pack()
+    root.mainloop()
+
 def main():
-    import mermaid
     rates = fetch_rates()
     mermaid_graph = build_mermaid_graph(rates)
     mmd_path = "tokens_graph.mmd"
-    svg_path = "tokens_graph.svg"
+    png_path = "tokens_graph.png"
     with open(mmd_path, "w") as f:
         f.write(mermaid_graph)
     print("Mermaid graph written to tokens_graph.mmd")
-    # Render to SVG using mermaid-py
-    svg = mermaid.render(mermaid_graph, output_format="svg")
-    with open(svg_path, "w") as f:
-        f.write(svg)
-    print("SVG graph written to tokens_graph.svg")
+    render_mermaid(mmd_path, png_path)
+    print("PNG graph written to tokens_graph.png")
+    show_image(png_path)
 
 if __name__ == "__main__":
     main()
