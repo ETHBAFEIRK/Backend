@@ -200,6 +200,30 @@ func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
 		}
 		rates = append(rates, rate)
 	}
+
+	// Also add all pairs from exchange_pairs as rates
+	pairRows, err := sm.ExchangeDB.Query(`SELECT token1, token2, exchange_id FROM exchange_pairs`)
+	if err == nil {
+		defer pairRows.Close()
+		for pairRows.Next() {
+			var token1, token2, exchangeID string
+			err := pairRows.Scan(&token1, &token2, &exchangeID)
+			if err != nil {
+				continue
+			}
+			rates = append(rates, model.Rate{
+				InputSymbol: token1,
+				OutputToken: token2,
+				ProjectName: exchangeID,
+				PoolName:    "",
+				APY:         0,
+				ProjectLink: "",
+				Points:      "",
+				OutputKind:  "swap",
+			})
+		}
+	}
+
 	return rates, nil
 }
 
