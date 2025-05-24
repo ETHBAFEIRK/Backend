@@ -34,7 +34,8 @@ def render_mermaid(input_path: str, output_path: str):
         "mmdc",
         "-i", input_path,
         "-o", output_path,
-        "-b", "white"
+        "-b", "white",
+        "--width", "2048"
     ], check=True)
 
 def show_image(path: str):
