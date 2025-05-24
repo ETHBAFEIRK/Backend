@@ -78,10 +78,12 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 			}
 			// Lido
 			{
-				id := scraper.LidoID
-				rate, err := scraper.ScrapeLido()
+				rates, err := scraper.ScrapeLido()
 				if err == nil {
-					_ = sm.SetCachedRateFull(id, rate, time.Now())
+					for _, rate := range rates {
+						id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName + ":" + rate.OutputToken
+						_ = sm.SetCachedRateFull(id, rate, time.Now())
+					}
 				}
 			}
 			time.Sleep(10 * time.Minute)
