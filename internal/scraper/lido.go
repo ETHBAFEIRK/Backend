@@ -13,10 +13,9 @@ import (
 )
 
 const (
-	LidoID         = "lido:ETH:Lido"
-	LidoProject    = "Lido"
-	LidoInput      = "ETH"
-	LidoOutput     = "stETH"
+	LidoID      = "lido:ETH:Lido"
+	LidoProject = "Lido"
+
 	LidoPool       = "Lido"
 	LidoProjectURL = "https://stake.lido.fi/"
 	LidoAPI        = "https://eth-api.lido.fi/v1/protocol/steth/apr/sma"
@@ -69,22 +68,14 @@ func ScrapeLido() ([]model.Rate, error) {
 	log.Printf("[scraper] Lido: APY scraped: %.4f", apy)
 	rates := []model.Rate{
 		{
-			InputSymbol: LidoInput,
-			OutputToken: LidoOutput,
+			InputSymbol: "ETH",
+			OutputToken: "stETH",
 			ProjectName: LidoProject,
 			PoolName:    LidoPool,
 			APY:         apy,
 			ProjectLink: LidoProjectURL,
 			Points:      "",
-		},
-		{
-			InputSymbol: LidoInput,
-			OutputToken: "wstETH",
-			ProjectName: LidoProject,
-			PoolName:    LidoPool,
-			APY:         apy,
-			ProjectLink: LidoProjectURL,
-			Points:      "",
+			OutputKind:  "stake",
 		},
 		{
 			InputSymbol: "stETH",

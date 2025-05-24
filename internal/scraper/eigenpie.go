@@ -106,7 +106,7 @@ func ScrapeEigenpie() ([]model.Rate, error) {
 				PoolName:    pool.PoolName,
 				APY:         apy,
 				ProjectLink: EigenpieProjectURL,
-				Points:      "Eigenpie Points: 1; EigenLayer Points: 1",
+				Points:      "Eigenpie Points: 2; EigenLayer Points: 1; Zircuit points: 1", // must be taken via API
 				OutputKind:  "restake",
 			})
 		}
