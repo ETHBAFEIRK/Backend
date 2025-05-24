@@ -26,25 +26,50 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rates(w http.ResponseWriter, r *http.Request) {
-	id := scraper.PufferID
-	project := scraper.PufferProject
-	inputSymbol := scraper.PufferInput
-	poolName := scraper.PufferPool
-
-	apy, _, found := scraperManager.GetCachedRate(id)
 	var rates []model.Rate
 
-	if found {
-		rate := model.Rate{
-			InputSymbol: inputSymbol,
-			OutputToken: "xpufETH",
-			ProjectName: project,
-			PoolName:    poolName,
-			APY:         apy,
-			ProjectLink: scraper.PufferProjectURL,
-			Points:      "Puffer Points: 1; Zircuit Points: 1; EigenLayer Points: 1",
+	// Puffer
+	{
+		id := scraper.PufferID
+		project := scraper.PufferProject
+		inputSymbol := scraper.PufferInput
+		poolName := scraper.PufferPool
+
+		apy, _, found := scraperManager.GetCachedRate(id)
+		if found {
+			rate := model.Rate{
+				InputSymbol: inputSymbol,
+				OutputToken: "xpufETH",
+				ProjectName: project,
+				PoolName:    poolName,
+				APY:         apy,
+				ProjectLink: scraper.PufferProjectURL,
+				Points:      "Puffer Points: 1; Zircuit Points: 1; EigenLayer Points: 1",
+			}
+			rates = append(rates, rate)
 		}
-		rates = append(rates, rate)
+	}
+
+	// Inception
+	{
+		id := scraper.InceptionID
+		project := scraper.InceptionProject
+		inputSymbol := scraper.InceptionInput
+		poolName := scraper.InceptionPool
+
+		apy, _, found := scraperManager.GetCachedRate(id)
+		if found {
+			rate := model.Rate{
+				InputSymbol: inputSymbol,
+				OutputToken: "inwstETH",
+				ProjectName: project,
+				PoolName:    poolName,
+				APY:         apy,
+				ProjectLink: scraper.InceptionProjectURL,
+				Points:      "",
+			}
+			rates = append(rates, rate)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -20,15 +20,29 @@ type ScraperManager struct {
 func (sm *ScraperManager) StartBackgroundScraping() {
 	go func() {
 		for {
-			id := scraper.PufferID
-			project := scraper.PufferProject
-			inputSymbol := scraper.PufferInput
-			poolName := scraper.PufferPool
+			// Puffer
+			{
+				id := scraper.PufferID
+				project := scraper.PufferProject
+				inputSymbol := scraper.PufferInput
+				poolName := scraper.PufferPool
 
-			// Always scrape and update DB
-			rate, err := scraper.ScrapePuffer()
-			if err == nil {
-				_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+				rate, err := scraper.ScrapePuffer()
+				if err == nil {
+					_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+				}
+			}
+			// Inception
+			{
+				id := scraper.InceptionID
+				project := scraper.InceptionProject
+				inputSymbol := scraper.InceptionInput
+				poolName := scraper.InceptionPool
+
+				rate, err := scraper.ScrapeInception()
+				if err == nil {
+					_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+				}
 			}
 			time.Sleep(10 * time.Minute)
 		}
