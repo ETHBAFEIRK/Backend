@@ -37,6 +37,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 	if found {
 		rate := model.Rate{
 			InputSymbol: inputSymbol,
+			OutputToken: "putETH",
 			ProjectName: project,
 			PoolName:    poolName,
 			APY:         apy,
