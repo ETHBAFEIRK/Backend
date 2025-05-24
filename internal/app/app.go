@@ -9,7 +9,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"example.com/rates/v2/internal/model"
 	"example.com/rates/v2/internal/scraper"
-	"log"
 )
 
 type ScraperManager struct {
@@ -47,18 +46,7 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 				}
 			}
 			// Kelp
-			{
-				rates, err := scraper.ScrapeKelp()
-				if err != nil {
-					log.Printf("[scraper] Kelp error: %v", err)
-				} else {
-					for _, rate := range rates {
-						id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName
-						log.Printf("[scraper] Kelp: input=%s, output=%s, apy=%.4f", rate.InputSymbol, rate.OutputToken, rate.APY)
-						_ = sm.SetCachedRateFull(id, rate, time.Now())
-					}
-				}
-			}
+			// TODO: implement scraper.ScrapeKelp() and add Kelp support here.
 			// Renzo (hardcoded, just update cache)
 			{
 				renzoProject := "Renzo"
