@@ -56,6 +56,18 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
+			// Eigenpie
+			{
+				rates, err := scraper.ScrapeEigenpie()
+				if err != nil {
+					log.Printf("[scraper] Eigenpie: error: %v", err)
+				} else {
+					for _, rate := range rates {
+						id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName
+						_ = sm.SetCachedRateFull(id, rate, time.Now())
+					}
+				}
+			}
 			// Stakestone
 			{
 				id := scraper.StakestoneID
