@@ -39,7 +39,7 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 			}
 			// ezETH (hardcoded, just update cache)
 			{
-				rates := scraper.ScrapeEzETH()
+				rates := scraper.ScrapeRenzo()
 				for _, rate := range rates {
 					id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName
 					_ = sm.SetCachedRateFull(id, rate, time.Now())
