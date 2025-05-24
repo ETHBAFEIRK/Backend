@@ -16,6 +16,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handler.Healthz)
 	mux.HandleFunc("/rates", handler.Rates)
+	mux.HandleFunc("/api/rates", handler.Rates)
 	mux.HandleFunc("/", handler.Home)
 
 	log.Println("Starting server on :8080")
