@@ -227,6 +227,18 @@ func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
 	return rates, nil
 }
 
+// GetPointsForRate returns the points string for a given rate from the DB, or "" if not found.
+func (sm *ScraperManager) GetPointsForRate(rate model.Rate) string {
+	row := sm.DB.QueryRow(`SELECT points FROM scrape_cache WHERE project = ? AND input_symbol = ? AND output_token = ? AND pool_name = ?`,
+		rate.ProjectName, rate.InputSymbol, rate.OutputToken, rate.PoolName)
+	var points string
+	err := row.Scan(&points)
+	if err != nil {
+		return ""
+	}
+	return points
+}
+
 func (sm *ScraperManager) SetCachedRateFull(id string, rate model.Rate, t time.Time) error {
 	log.Printf("[db] Update: input=%s, output=%s, apy=%.4f", rate.InputSymbol, rate.OutputToken, rate.APY)
 	_, err := sm.DB.Exec(`

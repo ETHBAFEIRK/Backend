@@ -81,10 +81,22 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add icons to each rate, but do NOT override OutputKind (use saved kind from DB)
+	// Restore Points from DB if missing (for exchange pairs)
 	for i := range rates {
 		rates[i].FromIcon = tokenIcons[rates[i].InputSymbol]
 		rates[i].ToIcon = tokenIcons[rates[i].OutputToken]
 		// OutputKind is already set from DB, do not override
+
+		// Restore Points from DB if missing (for exchange pairs)
+		if rates[i].Points == "" {
+			// Try to get points from DB for this input/output/project/pool
+			if scraperManager != nil {
+				points := scraperManager.GetPointsForRate(rates[i])
+				if points != "" {
+					rates[i].Points = points
+				}
+			}
+		}
 
 		// Set Optimal if both APY and MaxAPY are known and equal
 		if rates[i].APY != 0 && rates[i].MaxAPY != 0 && rates[i].APY == rates[i].MaxAPY {
