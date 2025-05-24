@@ -85,7 +85,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 					PoolName:    "renzo",
 					APY:         cachedAPY,
 					ProjectLink: "https://app.renzoprotocol.com",
-					Points:      "2x Zircuit Points; 2x Mellow Points; 3x InceptionLRT Totems; 1x Symbiotic Points",
+					Points:      "2x Zircuit Points",
 				}
 				rates = append(rates, rate)
 			}
