@@ -72,6 +72,31 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// ezETH (renzo)
+	{
+		project := "renzo"
+		poolName := "renzo"
+		projectLink := "https://app.renzoprotocol.com"
+		apy := 3.77
+
+		for _, inputSymbol := range []string{"ETH", "stETH"} {
+			id := project + ":" + inputSymbol + ":" + poolName
+			cachedAPY, _, found := scraperManager.GetCachedRate(id)
+			if found {
+				rate := model.Rate{
+					InputSymbol: inputSymbol,
+					OutputToken: "ezETH",
+					ProjectName: project,
+					PoolName:    poolName,
+					APY:         cachedAPY,
+					ProjectLink: projectLink,
+					Points:      "",
+				}
+				rates = append(rates, rate)
+			}
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rates)
 }

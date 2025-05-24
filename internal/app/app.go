@@ -44,6 +44,14 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
 				}
 			}
+			// ezETH (hardcoded, just update cache)
+			{
+				rates := scraper.ScrapeEzETH()
+				for _, rate := range rates {
+					id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName
+					_ = sm.SetCachedRate(id, rate.ProjectName, rate.InputSymbol, rate.PoolName, rate.APY, time.Now())
+				}
+			}
 			time.Sleep(10 * time.Minute)
 		}
 	}()
