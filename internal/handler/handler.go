@@ -41,6 +41,21 @@ var tokenIcons = map[string]string{
 	"weETHs":   "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/weeths-logo.70e83562.svg",
 }
 
+// Output token kind mapping: stake or restake
+var tokenKind = map[string]string{
+	// APY < 3 as of 2025-05-24:
+	"xPufETH":  "restake",
+	"inwstETH": "restake",
+	"pzETH":    "restake",
+	"STONE":    "stake",
+	"stETH":    "stake",
+	"egETH":    "restake",
+	// APY >= 3 (for reference, not used in this map):
+	// "ezETH": "restake",
+	// "rsETH": "restake",
+	// "mstETH": "restake",
+}
+
 var scraperManager *app.ScraperManager
 
 func InitScraperManager(sm *app.ScraperManager) {
@@ -63,10 +78,15 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch rates", http.StatusInternalServerError)
 		return
 	}
-	// Add icons to each rate
+	// Add icons and kind to each rate
 	for i := range rates {
 		rates[i].FromIcon = tokenIcons[rates[i].InputSymbol]
 		rates[i].ToIcon = tokenIcons[rates[i].OutputToken]
+		if kind, ok := tokenKind[rates[i].OutputToken]; ok {
+			rates[i].OutputKind = kind
+		} else {
+			rates[i].OutputKind = ""
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rates)
