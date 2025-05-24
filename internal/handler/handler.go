@@ -78,6 +78,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch rates", http.StatusInternalServerError)
 		return
 	}
+
 	// Add icons and kind to each rate
 	for i := range rates {
 		rates[i].FromIcon = tokenIcons[rates[i].InputSymbol]
@@ -88,6 +89,55 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 			rates[i].OutputKind = ""
 		}
 	}
+
+	// --- Begin: filter out isolated pairs ---
+	// Build set of destination tokens (those with icons)
+	destinations := make(map[string]struct{})
+	for token := range tokenIcons {
+		destinations[token] = struct{}{}
+	}
+
+	// Build adjacency list for the graph
+	adj := make(map[string][]string)
+	for _, rate := range rates {
+		adj[rate.InputSymbol] = append(adj[rate.InputSymbol], rate.OutputToken)
+	}
+
+	// Find all tokens that can reach a destination via BFS
+	reachable := make(map[string]struct{})
+	queue := make([]string, 0)
+	visited := make(map[string]struct{})
+
+	// Start from all destination tokens
+	for dest := range destinations {
+		queue = append(queue, dest)
+		reachable[dest] = struct{}{}
+	}
+
+	for len(queue) > 0 {
+		curr := queue[0]
+		queue = queue[1:]
+		for token, outs := range adj {
+			for _, out := range outs {
+				if out == curr {
+					if _, seen := reachable[token]; !seen {
+						reachable[token] = struct{}{}
+						queue = append(queue, token)
+					}
+				}
+			}
+		}
+	}
+
+	// Filter rates: keep only those where output is reachable from some input to a destination
+	filtered := make([]model.Rate, 0, len(rates))
+	for _, rate := range rates {
+		// If input or output is in reachable set, keep
+		if _, ok := reachable[rate.InputSymbol]; ok {
+			filtered = append(filtered, rate)
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(rates)
+	json.NewEncoder(w).Encode(filtered)
 }
