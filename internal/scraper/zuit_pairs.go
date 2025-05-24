@@ -1,9 +1,5 @@
 package scraper
 
-import (
-	"example.com/rates/v2/internal/model"
-)
-
 type ExchangePair struct {
 	ID                int
 	Pool              string
