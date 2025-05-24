@@ -15,7 +15,10 @@ type ScraperManager struct {
 	DB         *sql.DB
 	LastScrape map[string]time.Time
 	Mutex      sync.Mutex
+	ExchangeDB *sql.DB
 }
+
+import "example.com/rates/v2/internal/scraper"
 
 // StartBackgroundScraping launches a goroutine that scrapes Puffer every 10 minutes.
 func (sm *ScraperManager) StartBackgroundScraping() {
@@ -86,6 +89,29 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					}
 				}
 			}
+			// Zuit pairs (dummy)
+			{
+				pairs := scraper.ScrapeZuitPairs()
+				for _, pair := range pairs {
+					_, err := sm.ExchangeDB.Exec(`
+						INSERT INTO exchange_pairs (id, pool, token1, token2, type, liquidity, liquidity_formatted, apr, apr_formatted, exchange_id)
+						VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+						ON CONFLICT(id) DO UPDATE SET
+							pool=excluded.pool,
+							token1=excluded.token1,
+							token2=excluded.token2,
+							type=excluded.type,
+							liquidity=excluded.liquidity,
+							liquidity_formatted=excluded.liquidity_formatted,
+							apr=excluded.apr,
+							apr_formatted=excluded.apr_formatted,
+							exchange_id=excluded.exchange_id
+					`, pair.ID, pair.Pool, pair.Token1, pair.Token2, pair.Type, pair.Liquidity, pair.LiquidityFormatted, pair.APR, pair.APRFormatted, pair.ExchangeID)
+					if err != nil {
+						log.Printf("[exchange_pairs] failed to upsert: %v", err)
+					}
+				}
+			}
 			time.Sleep(10 * time.Minute)
 		}
 	}()
@@ -113,9 +139,34 @@ func NewScraperManager(dbPath string) *ScraperManager {
 	if err != nil {
 		log.Fatalf("failed to create scrape_cache table: %v", err)
 	}
+
+	// Open or create exchange_pairs.db
+	exdb, err := sql.Open("sqlite3", "exchange_pairs.db")
+	if err != nil {
+		log.Fatalf("failed to open exchange_pairs.db: %v", err)
+	}
+	_, err = exdb.Exec(`
+		CREATE TABLE IF NOT EXISTS exchange_pairs (
+			id INTEGER PRIMARY KEY,
+			pool TEXT,
+			token1 TEXT,
+			token2 TEXT,
+			type TEXT,
+			liquidity REAL,
+			liquidity_formatted TEXT,
+			apr REAL,
+			apr_formatted TEXT,
+			exchange_id TEXT
+		)
+	`)
+	if err != nil {
+		log.Fatalf("failed to create exchange_pairs table: %v", err)
+	}
+
 	return &ScraperManager{
 		DB:         db,
 		LastScrape: make(map[string]time.Time),
+		ExchangeDB: exdb,
 	}
 }
 
