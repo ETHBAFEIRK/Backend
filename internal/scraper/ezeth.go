@@ -1,38 +1,36 @@
 package scraper
 
-import (
-	"example.com/rates/v2/internal/model"
-	"log"
-)
+import "example.com/rates/v2/internal/model"
 
-const (
-	EzETHProject    = "renzo"
-	EzETHPool       = "renzo"
-	EzETHProjectURL = "https://app.renzoprotocol.com"
-	EzETHAPY        = 3.77
-)
-
-func ScrapeEzETH() []model.Rate {
-	log.Println("[scraper] Scraping (hardcoded) ezETH rates...")
-	points := "2x Zircuit Points"
+// ScrapeRenzo returns hardcoded Renzo rates (ETH, WETH, wstETH -> pzETH at 2.86).
+func ScrapeRenzo() []model.Rate {
 	return []model.Rate{
 		{
 			InputSymbol: "ETH",
-			OutputToken: "ezETH",
-			ProjectName: EzETHProject,
-			PoolName:    EzETHPool,
-			APY:         EzETHAPY,
-			ProjectLink: EzETHProjectURL,
-			Points:      points,
+			OutputToken: "pzETH",
+			ProjectName: "Renzo",
+			PoolName:    "Renzo",
+			APY:         2.86,
+			ProjectLink: "https://app.renzoprotocol.com/",
+			Points:      "EigenLayer Points: 1; Renzo Points: 1",
 		},
 		{
-			InputSymbol: "stETH",
-			OutputToken: "ezETH",
-			ProjectName: EzETHProject,
-			PoolName:    EzETHPool,
-			APY:         EzETHAPY,
-			ProjectLink: EzETHProjectURL,
-			Points:      points,
+			InputSymbol: "WETH",
+			OutputToken: "pzETH",
+			ProjectName: "Renzo",
+			PoolName:    "Renzo",
+			APY:         2.86,
+			ProjectLink: "https://app.renzoprotocol.com/",
+			Points:      "EigenLayer Points: 1; Renzo Points: 1",
+		},
+		{
+			InputSymbol: "wstETH",
+			OutputToken: "pzETH",
+			ProjectName: "Renzo",
+			PoolName:    "Renzo",
+			APY:         2.86,
+			ProjectLink: "https://app.renzoprotocol.com/",
+			Points:      "EigenLayer Points: 1; Renzo Points: 1",
 		},
 	}
 }
