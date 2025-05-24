@@ -23,18 +23,21 @@ type eigenpieAPIResponse struct {
 		Snapshot struct {
 			ChainData []struct {
 				ChainId int `json:"chainId"`
-				Data    []struct {
-					PoolId           int    `json:"poolId"`
-					PoolName         string `json:"poolName"`
-					StakeTokenInfo   struct {
-						Symbol string `json:"symbol"`
-					} `json:"stakeTokenInfo"`
-					ReceiptTokenInfo struct {
-						Symbol string `json:"symbol"`
-					} `json:"receiptTokenInfo"`
-					AprInfo struct {
-						FormatValue string `json:"formatValue"`
-					} `json:"aprInfo"`
+				Data    struct {
+					IsExpired bool `json:"isExpired"`
+					Data      []struct {
+						PoolId           int    `json:"poolId"`
+						PoolName         string `json:"poolName"`
+						StakeTokenInfo   struct {
+							Symbol string `json:"symbol"`
+						} `json:"stakeTokenInfo"`
+						ReceiptTokenInfo struct {
+							Symbol string `json:"symbol"`
+						} `json:"receiptTokenInfo"`
+						AprInfo struct {
+							FormatValue string `json:"formatValue"`
+						} `json:"aprInfo"`
+					} `json:"data"`
 				} `json:"data"`
 			} `json:"chainData"`
 		} `json:"snapshot"`
@@ -81,7 +84,7 @@ func ScrapeEigenpie() ([]model.Rate, error) {
 		if chain.ChainId != 1 {
 			continue
 		}
-		for _, pool := range chain.Data {
+		for _, pool := range chain.Data.Data {
 			apy, err := strconv.ParseFloat(pool.AprInfo.FormatValue, 64)
 			if err != nil {
 				log.Printf("[scraper] Eigenpie: failed to parse APY for %s: %v", pool.PoolName, err)
