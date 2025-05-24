@@ -28,48 +28,22 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rates(w http.ResponseWriter, r *http.Request) {
-	// Only one scraper for now: Puffer
 	id := scraper.PufferID
 	project := scraper.PufferProject
 	inputSymbol := scraper.PufferInput
 	poolName := scraper.PufferPool
 
-	// Check cache
 	apy, lastScrape, found := scraperManager.GetCachedRate(id)
-	shouldScrape := true
-	if found && time.Since(lastScrape) < 10*time.Minute {
-		shouldScrape = false
-	}
+	var rates []model.Rate
 
-	var rate model.Rate
-	var err error
-	if shouldScrape {
-		rate, err = scraper.ScrapePuffer()
-		if err == nil {
-			apy = rate.APY
-			_ = scraperManager.SetCachedRate(id, project, inputSymbol, poolName, apy, time.Now())
-		} else if found {
-			// fallback to cached
-			rate = model.Rate{
-				InputSymbol: inputSymbol,
-				ProjectName: project,
-				PoolName:    poolName,
-				APY:         apy,
-				ProjectLink: scraper.PufferProjectURL,
-			}
-		}
-	} else {
-		rate = model.Rate{
+	if found {
+		rate := model.Rate{
 			InputSymbol: inputSymbol,
 			ProjectName: project,
 			PoolName:    poolName,
 			APY:         apy,
 			ProjectLink: scraper.PufferProjectURL,
 		}
-	}
-
-	rates := []model.Rate{}
-	if rate.ProjectName != "" {
 		rates = append(rates, rate)
 	}
 

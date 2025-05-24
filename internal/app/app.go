@@ -7,12 +7,33 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+	"example.com/rates/v2/internal/model"
+	"example.com/rates/v2/internal/scraper"
 )
 
 type ScraperManager struct {
 	DB         *sql.DB
 	LastScrape map[string]time.Time
 	Mutex      sync.Mutex
+}
+
+// StartBackgroundScraping launches a goroutine that scrapes Puffer every 10 minutes.
+func (sm *ScraperManager) StartBackgroundScraping() {
+	go func() {
+		for {
+			id := scraper.PufferID
+			project := scraper.PufferProject
+			inputSymbol := scraper.PufferInput
+			poolName := scraper.PufferPool
+
+			// Always scrape and update DB
+			rate, err := scraper.ScrapePuffer()
+			if err == nil {
+				_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+			}
+			time.Sleep(10 * time.Minute)
+		}
+	}()
 }
 
 func NewScraperManager(dbPath string) *ScraperManager {

@@ -11,6 +11,7 @@ import (
 func main() {
 	scraperManager := app.NewScraperManager("scrape_cache.db")
 	handler.InitScraperManager(scraperManager)
+	scraperManager.StartBackgroundScraping()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handler.Healthz)
