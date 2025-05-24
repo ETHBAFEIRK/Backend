@@ -7,10 +7,17 @@ def fetch_rates(url="http://localhost:8080/rates"):
     return resp.json()
 
 def build_mermaid_graph(rates):
+    # --- Get the set of tokens with icons from the backend ---
+    # This list must match the backend's tokenIcons keys.
+    token_icons = {
+        "ETH", "WETH", "stETH", "wstETH", "ezETH", "pzETH", "STONE", "xPufETH", "mstETH", "weETH", "egETH",
+        "inwstETH", "rsETH", "LsETH", "USDC", "USDT", "USDe", "FBTC", "LBTC", "mBTC", "pumpBTC", "mswETH",
+        "mwBETH", "mETH", "rstETH", "steakLRT", "Re7LRT", "amphrETH", "rswETH", "swETH", "weETHs"
+    }
+
+    # Build the graph as adjacency list and reverse adjacency for pruning
     nodes = set()
-    # For each (from_token, to_token), collect all rates and their kinds
     edge_map = {}
-    # Map to store the highest APY for each target node (output token)
     target_apy = {}
 
     for rate in rates:
@@ -20,41 +27,60 @@ def build_mermaid_graph(rates):
         apy = rate.get("apy")
         nodes.add(from_token)
         nodes.add(to_token)
-        # Store all rates for each (from, to) pair
         edge_map.setdefault((from_token, to_token), []).append((kind, apy))
-        # Store the highest APY for each output token
         if to_token not in target_apy or apy > target_apy[to_token]:
             target_apy[to_token] = apy
 
-    # Now, for each (from, to), prefer "stake"/"restake" over "swap"
-    edges = []
+    # --- Prune nodes and edges not leading to a token with an icon ---
+    # 1. Build adjacency list
+    adj = {}
+    rev_adj = {}
+    for (from_token, to_token) in edge_map:
+        adj.setdefault(from_token, set()).add(to_token)
+        rev_adj.setdefault(to_token, set()).add(from_token)
+
+    # 2. Find all nodes that can reach a token with an icon (reverse BFS)
+    reachable = set(token_icons)
+    queue = list(token_icons)
+    while queue:
+        curr = queue.pop()
+        for prev in rev_adj.get(curr, []):
+            if prev not in reachable:
+                reachable.add(prev)
+                queue.append(prev)
+
+    # 3. Only keep nodes and edges where the output token is in reachable set and is in token_icons
+    pruned_nodes = set()
+    pruned_edges = []
     for (from_token, to_token), kind_apys in edge_map.items():
-        # Find if any "stake" or "restake" exists
+        if to_token not in reachable:
+            continue
+        if to_token not in token_icons:
+            continue
+        pruned_nodes.add(from_token)
+        pruned_nodes.add(to_token)
+        # Prefer "stake"/"restake" over "swap"
         preferred = None
-        preferred_apy = None
         for kind, apy in kind_apys:
             if kind in ("stake", "restake"):
                 preferred = kind
-                preferred_apy = apy
                 break
         if preferred:
             label = preferred
         else:
-            # If no stake/restake, use the first kind (likely "swap")
             label = kind_apys[0][0]
-        # Escape quotes in label
         label = label.replace('"', '\\"') if label else ""
-        edges.append((from_token, to_token, label))
+        pruned_edges.append((from_token, to_token, label))
 
+    # 4. Only keep nodes that are in pruned_edges
     mermaid = ["graph TD"]
-    for node in sorted(nodes):
+    for node in sorted(pruned_nodes):
         if node in target_apy:
             apy_val = target_apy[node]
-            # Format APY to 2 decimal places, show as e.g. "wstETH (4.12%)"
             mermaid.append(f'    {node}["{node} ({apy_val:.2f}%)"]')
         else:
             mermaid.append(f'    {node}["{node}"]')
-    for from_token, to_token, label in edges:
+    for from_token, to_token, label in pruned_edges:
         if label:
             mermaid.append(f'    {from_token} -->|{label}| {to_token}')
         else:
