@@ -86,6 +86,16 @@ func ScrapeLido() ([]model.Rate, error) {
 			ProjectLink: LidoProjectURL,
 			Points:      "",
 		},
+		{
+			InputSymbol: "stETH",
+			OutputToken: "wstETH",
+			ProjectName: LidoProject,
+			PoolName:    LidoPool,
+			APY:         0,
+			ProjectLink: LidoProjectURL,
+			Points:      "",
+			OutputKind:  "wrap",
+		},
 	}
 	return rates, nil
 }
