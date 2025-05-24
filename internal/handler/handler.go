@@ -9,7 +9,7 @@ import (
 
 var tokenIcons = map[string]string{
 	"ETH":      "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/eth-logo.9c7e160a.svg",
-	"WETH":     "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/eth-logo.9c7e160a.svg",
+	"WETH":     "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/eth-logo.9c7e160a.svg:",
 	"stETH":    "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/wsteth-logo.70d80504.svg",
 	"wstETH":   "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/wsteth-logo.70d80504.svg",
 	"ezETH":    "https://static.zircuit.com/stake/app-dbbe0da3d/_next/static/media/ezeth-logo.6809574f.svg",
@@ -125,16 +125,16 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 
 	// Filter rates: keep only those where output is reachable from some input to a destination
 	filtered := make([]struct {
-		InputSymbol   string  `json:"input_symbol"`
-		OutputToken   string  `json:"output_token"`
-		ProjectName   string  `json:"project_name"`
-		PoolName      string  `json:"pool_name"`
-		APY           float64 `json:"apy"`
-		ProjectLink   string  `json:"project_link"`
-		Points        string  `json:"points"`
-		FromIcon      string  `json:"from_icon"`
-		ToIcon        string  `json:"to_icon"`
-		OutputKind    string  `json:"output_kind"`
+		InputSymbol string  `json:"input_symbol"`
+		OutputToken string  `json:"output_token"`
+		ProjectName string  `json:"project_name"`
+		PoolName    string  `json:"pool_name"`
+		APY         float64 `json:"apy"`
+		ProjectLink string  `json:"project_link"`
+		Points      string  `json:"points"`
+		FromIcon    string  `json:"from_icon"`
+		ToIcon      string  `json:"to_icon"`
+		OutputKind  string  `json:"output_kind"`
 	}, 0, len(rates))
 	for _, rate := range rates {
 		// If input or output is in reachable set, keep
