@@ -67,13 +67,27 @@ func ScrapeLido() (model.Rate, error) {
 		return model.Rate{}, errors.New("smaApr not found in response")
 	}
 	log.Printf("[scraper] Lido: APY scraped: %.4f", apy)
-	return model.Rate{
-		InputSymbol: LidoInput,
-		OutputToken: LidoOutput,
-		ProjectName: LidoProject,
-		PoolName:    LidoPool,
-		APY:         apy,
-		ProjectLink: LidoProjectURL,
-		Points:      "",
-	}, nil
+	// Return both stETH and wstETH as output tokens
+	returns := []model.Rate{
+		{
+			InputSymbol: LidoInput,
+			OutputToken: LidoOutput,
+			ProjectName: LidoProject,
+			PoolName:    LidoPool,
+			APY:         apy,
+			ProjectLink: LidoProjectURL,
+			Points:      "",
+		},
+		{
+			InputSymbol: LidoInput,
+			OutputToken: "wstETH",
+			ProjectName: LidoProject,
+			PoolName:    LidoPool,
+			APY:         apy,
+			ProjectLink: LidoProjectURL,
+			Points:      "",
+		},
+	}
+	// For backward compatibility, return the stETH record as the main result, but let caller use both if needed
+	return returns[0], nil
 }
