@@ -84,6 +84,11 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		rates[i].FromIcon = tokenIcons[rates[i].InputSymbol]
 		rates[i].ToIcon = tokenIcons[rates[i].OutputToken]
 		// OutputKind is already set from DB, do not override
+
+		// Set Optimal if both APY and MaxAPY are known and equal
+		if rates[i].APY != 0 && rates[i].MaxAPY != 0 && rates[i].APY == rates[i].MaxAPY {
+			rates[i].Optimal = true
+		}
 	}
 
 	// --- Begin: filter out isolated pairs ---
@@ -124,18 +129,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Filter rates: keep only those where output is reachable from some input to a destination
-	filtered := make([]struct {
-		InputSymbol string  `json:"input_symbol"`
-		OutputToken string  `json:"output_token"`
-		ProjectName string  `json:"project_name"`
-		PoolName    string  `json:"pool_name"`
-		APY         float64 `json:"apy"`
-		ProjectLink string  `json:"project_link"`
-		Points      string  `json:"points"`
-		FromIcon    string  `json:"from_icon"`
-		ToIcon      string  `json:"to_icon"`
-		OutputKind  string  `json:"output_kind"`
-	}, 0, len(rates))
+	filtered := make([]model.Rate, 0, len(rates))
 	for _, rate := range rates {
 		// If input or output is in reachable set, keep
 		if _, ok := reachable[rate.InputSymbol]; ok {
