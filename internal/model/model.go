@@ -8,4 +8,6 @@ type Rate struct {
 	APY          float64 `json:"apy"`
 	ProjectLink  string  `json:"project_link"`
 	Points       string  `json:"points"`
+	FromIcon     string  `json:"from_icon"`
+	ToIcon       string  `json:"to_icon"`
 }
