@@ -11,14 +11,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// ScraperManager manages scraping and caching.
 type ScraperManager struct {
 	DB         *sql.DB
 	LastScrape map[string]time.Time
 	Mutex      sync.Mutex
 	ExchangeDB *sql.DB
 }
-
-import "example.com/rates/v2/internal/scraper"
 
 // StartBackgroundScraping launches a goroutine that scrapes Puffer every 10 minutes.
 func (sm *ScraperManager) StartBackgroundScraping() {
