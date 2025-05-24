@@ -80,11 +80,20 @@ func ScrapeEigenpie() ([]model.Rate, error) {
 	}
 
 	var rates []model.Rate
+	allowedOutputs := map[string]struct{}{
+		"mstETH": {},
+		"weETH":  {},
+		"wstETH": {},
+		"egETH":  {},
+	}
 	for _, chain := range apiResp.Data.Snapshot.ChainData {
 		if chain.ChainId != 1 {
 			continue
 		}
 		for _, pool := range chain.Data.Data {
+			if _, ok := allowedOutputs[pool.ReceiptTokenInfo.Symbol]; !ok {
+				continue
+			}
 			apy, err := strconv.ParseFloat(pool.AprInfo.FormatValue, 64)
 			if err != nil {
 				log.Printf("[scraper] Eigenpie: failed to parse APY for %s: %v", pool.PoolName, err)
