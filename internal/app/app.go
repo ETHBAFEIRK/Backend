@@ -92,7 +92,16 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 			{
 				pairs := scraper.ScrapeZuitPairs()
 				for _, pair := range pairs {
-					_, err := sm.ExchangeDB.Exec(`
+					sm.updatePair(pair)
+				}
+			}
+			time.Sleep(10 * time.Minute)
+		}
+	}()
+}
+
+func (sm *ScraperManager) updatePair(pair scraper.ExchangePair) {
+	_, err := sm.ExchangeDB.Exec(`
 						INSERT INTO exchange_pairs (id, pool, token1, token2, type, liquidity, liquidity_formatted, apr, apr_formatted, exchange_id)
 						VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 						ON CONFLICT(id) DO UPDATE SET
@@ -106,14 +115,9 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 							apr_formatted=excluded.apr_formatted,
 							exchange_id=excluded.exchange_id
 					`, pair.ID, pair.Pool, pair.Token1, pair.Token2, pair.Type, pair.Liquidity, pair.LiquidityFormatted, pair.APR, pair.APRFormatted, pair.ExchangeID)
-					if err != nil {
-						log.Printf("[exchange_pairs] failed to upsert: %v", err)
-					}
-				}
-			}
-			time.Sleep(10 * time.Minute)
-		}
-	}()
+	if err != nil {
+		log.Printf("[exchange_pairs] failed to upsert: %v", err)
+	}
 }
 
 func NewScraperManager(dbPath string) *ScraperManager {
