@@ -42,6 +42,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 			PoolName:    poolName,
 			APY:         apy,
 			ProjectLink: scraper.PufferProjectURL,
+			Points:      "Puffer Points: 1; Zircuit Points: 1; EigenLayer Points: 1",
 		}
 		rates = append(rates, rate)
 	}

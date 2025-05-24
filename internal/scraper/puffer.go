@@ -75,5 +75,6 @@ func ScrapePuffer() (model.Rate, error) {
 		PoolName:    PufferPool,
 		APY:         apy,
 		ProjectLink: PufferProjectURL,
+		Points:      "Puffer Points: 1; Zircuit Points: 1; EigenLayer Points: 1",
 	}, nil
 }

@@ -7,4 +7,5 @@ type Rate struct {
 	PoolName     string  `json:"pool_name"`
 	APY          float64 `json:"apy"`
 	ProjectLink  string  `json:"project_link"`
+	Points       string  `json:"points"`
 }
