@@ -1,7 +1,5 @@
 import requests
 import subprocess
-import tkinter as tk
-from PIL import Image, ImageTk
 
 def fetch_rates(url="http://localhost:8080/rates"):
     resp = requests.get(url)
@@ -40,12 +38,7 @@ def render_mermaid(input_path: str, output_path: str):
     ], check=True)
 
 def show_image(path: str):
-    root = tk.Tk()
-    img = Image.open(path)
-    tk_img = ImageTk.PhotoImage(img)
-    label = tk.Label(root, image=tk_img)
-    label.pack()
-    root.mainloop()
+    subprocess.run(["open", path], check=True)
 
 def main():
     rates = fetch_rates()
