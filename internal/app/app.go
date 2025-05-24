@@ -45,6 +45,29 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
+			// Renzo (hardcoded, just update cache)
+			{
+				renzoProject := "Renzo"
+				renzoPool := "Renzo"
+				renzoProjectLink := "https://app.renzoprotocol.com/"
+				renzoPoints := "EigenLayer Points: 1; Renzo Points: 1"
+				renzoAPY := 2.86
+				renzoOutput := "pzETH"
+				renzoInputs := []string{"ETH", "WETH", "wstETH"}
+				for _, input := range renzoInputs {
+					rate := model.Rate{
+						InputSymbol:  input,
+						OutputToken:  renzoOutput,
+						ProjectName:  renzoProject,
+						PoolName:     renzoPool,
+						APY:          renzoAPY,
+						ProjectLink:  renzoProjectLink,
+						Points:       renzoPoints,
+					}
+					id := renzoProject + ":" + input + ":" + renzoPool
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
+				}
+			}
 			time.Sleep(10 * time.Minute)
 		}
 	}()
