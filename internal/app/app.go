@@ -106,6 +106,7 @@ func NewScraperManager(dbPath string) *ScraperManager {
 			apy REAL,
 			project_link TEXT,
 			points TEXT,
+			output_kind TEXT,
 			last_scrape TIMESTAMP
 		)
 	`)
@@ -120,10 +121,10 @@ func NewScraperManager(dbPath string) *ScraperManager {
 
 // Returns (model.Rate, lastScrape, found)
 func (sm *ScraperManager) GetCachedRate(id string) (model.Rate, time.Time, bool) {
-	row := sm.DB.QueryRow(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape FROM scrape_cache WHERE id = ?`, id)
+	row := sm.DB.QueryRow(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points, output_kind, last_scrape FROM scrape_cache WHERE id = ?`, id)
 	var rate model.Rate
 	var lastScrape time.Time
-	err := row.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points, &lastScrape)
+	err := row.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points, &rate.OutputKind, &lastScrape)
 	if err != nil {
 		return model.Rate{}, time.Time{}, false
 	}
@@ -131,7 +132,7 @@ func (sm *ScraperManager) GetCachedRate(id string) (model.Rate, time.Time, bool)
 }
 
 func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
-	rows, err := sm.DB.Query(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points FROM scrape_cache`)
+	rows, err := sm.DB.Query(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points, output_kind FROM scrape_cache`)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +140,7 @@ func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
 	var rates []model.Rate
 	for rows.Next() {
 		var rate model.Rate
-		err := rows.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points)
+		err := rows.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points, &rate.OutputKind)
 		if err != nil {
 			continue
 		}
@@ -151,8 +152,8 @@ func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
 func (sm *ScraperManager) SetCachedRateFull(id string, rate model.Rate, t time.Time) error {
 	log.Printf("[db] Update: input=%s, output=%s, apy=%.4f", rate.InputSymbol, rate.OutputToken, rate.APY)
 	_, err := sm.DB.Exec(`
-		INSERT INTO scrape_cache (id, project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO scrape_cache (id, project, input_symbol, output_token, pool_name, apy, project_link, points, output_kind, last_scrape)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET 
 			project=excluded.project,
 			input_symbol=excluded.input_symbol,
@@ -161,7 +162,8 @@ func (sm *ScraperManager) SetCachedRateFull(id string, rate model.Rate, t time.T
 			apy=excluded.apy,
 			project_link=excluded.project_link,
 			points=excluded.points,
+			output_kind=excluded.output_kind,
 			last_scrape=excluded.last_scrape
-	`, id, rate.ProjectName, rate.InputSymbol, rate.OutputToken, rate.PoolName, rate.APY, rate.ProjectLink, rate.Points, t)
+	`, id, rate.ProjectName, rate.InputSymbol, rate.OutputToken, rate.PoolName, rate.APY, rate.ProjectLink, rate.Points, rate.OutputKind, t)
 	return err
 }
