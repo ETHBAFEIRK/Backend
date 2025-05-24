@@ -23,25 +23,17 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 			// Puffer
 			{
 				id := scraper.PufferID
-				project := scraper.PufferProject
-				inputSymbol := scraper.PufferInput
-				poolName := scraper.PufferPool
-
 				rate, err := scraper.ScrapePuffer()
 				if err == nil {
-					_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
 			// Inception
 			{
 				id := scraper.InceptionID
-				project := scraper.InceptionProject
-				inputSymbol := scraper.InceptionInput
-				poolName := scraper.InceptionPool
-
 				rate, err := scraper.ScrapeInception()
 				if err == nil {
-					_ = sm.SetCachedRate(id, project, inputSymbol, poolName, rate.APY, time.Now())
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
 			// ezETH (hardcoded, just update cache)
@@ -49,7 +41,7 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 				rates := scraper.ScrapeEzETH()
 				for _, rate := range rates {
 					id := rate.ProjectName + ":" + rate.InputSymbol + ":" + rate.PoolName
-					_ = sm.SetCachedRate(id, rate.ProjectName, rate.InputSymbol, rate.PoolName, rate.APY, time.Now())
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
 			time.Sleep(10 * time.Minute)
@@ -67,8 +59,11 @@ func NewScraperManager(dbPath string) *ScraperManager {
 			id TEXT PRIMARY KEY,
 			project TEXT,
 			input_symbol TEXT,
+			output_token TEXT,
 			pool_name TEXT,
 			apy REAL,
+			project_link TEXT,
+			points TEXT,
 			last_scrape TIMESTAMP
 		)
 	`)
@@ -81,22 +76,53 @@ func NewScraperManager(dbPath string) *ScraperManager {
 	}
 }
 
-func (sm *ScraperManager) GetCachedRate(id string) (float64, time.Time, bool) {
-	row := sm.DB.QueryRow("SELECT apy, last_scrape FROM scrape_cache WHERE id = ?", id)
-	var apy float64
+import (
+	"example.com/rates/v2/internal/model"
+)
+
+// Returns (model.Rate, lastScrape, found)
+func (sm *ScraperManager) GetCachedRate(id string) (model.Rate, time.Time, bool) {
+	row := sm.DB.QueryRow(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape FROM scrape_cache WHERE id = ?`, id)
+	var rate model.Rate
 	var lastScrape time.Time
-	err := row.Scan(&apy, &lastScrape)
+	err := row.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points, &lastScrape)
 	if err != nil {
-		return 0, time.Time{}, false
+		return model.Rate{}, time.Time{}, false
 	}
-	return apy, lastScrape, true
+	return rate, lastScrape, true
 }
 
-func (sm *ScraperManager) SetCachedRate(id, project, inputSymbol, poolName string, apy float64, t time.Time) error {
+func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
+	rows, err := sm.DB.Query(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points FROM scrape_cache`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var rates []model.Rate
+	for rows.Next() {
+		var rate model.Rate
+		err := rows.Scan(&rate.ProjectName, &rate.InputSymbol, &rate.OutputToken, &rate.PoolName, &rate.APY, &rate.ProjectLink, &rate.Points)
+		if err != nil {
+			continue
+		}
+		rates = append(rates, rate)
+	}
+	return rates, nil
+}
+
+func (sm *ScraperManager) SetCachedRateFull(id string, rate model.Rate, t time.Time) error {
 	_, err := sm.DB.Exec(`
-		INSERT INTO scrape_cache (id, project, input_symbol, pool_name, apy, last_scrape)
-		VALUES (?, ?, ?, ?, ?, ?)
-		ON CONFLICT(id) DO UPDATE SET apy=excluded.apy, last_scrape=excluded.last_scrape
-	`, id, project, inputSymbol, poolName, apy, t)
+		INSERT INTO scrape_cache (id, project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT(id) DO UPDATE SET 
+			project=excluded.project,
+			input_symbol=excluded.input_symbol,
+			output_token=excluded.output_token,
+			pool_name=excluded.pool_name,
+			apy=excluded.apy,
+			project_link=excluded.project_link,
+			points=excluded.points,
+			last_scrape=excluded.last_scrape
+	`, id, rate.ProjectName, rate.InputSymbol, rate.OutputToken, rate.PoolName, rate.APY, rate.ProjectLink, rate.Points, t)
 	return err
 }

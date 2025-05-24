@@ -26,72 +26,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rates(w http.ResponseWriter, r *http.Request) {
-	var rates []model.Rate
-
-	// Puffer
-	{
-		id := scraper.PufferID
-		project := scraper.PufferProject
-		inputSymbol := scraper.PufferInput
-		poolName := scraper.PufferPool
-
-		apy, _, found := scraperManager.GetCachedRate(id)
-		if found {
-			rate := model.Rate{
-				InputSymbol: inputSymbol,
-				OutputToken: "xpufETH",
-				ProjectName: project,
-				PoolName:    poolName,
-				APY:         apy,
-				ProjectLink: scraper.PufferProjectURL,
-				Points:      "Puffer Points: 1; Zircuit Points: 1; EigenLayer Points: 1",
-			}
-			rates = append(rates, rate)
-		}
+	rates, err := scraperManager.GetAllRates()
+	if err != nil {
+		http.Error(w, "Failed to fetch rates", http.StatusInternalServerError)
+		return
 	}
-
-	// Inception
-	{
-		id := scraper.InceptionID
-		project := scraper.InceptionProject
-		inputSymbol := scraper.InceptionInput
-		poolName := scraper.InceptionPool
-
-		apy, _, found := scraperManager.GetCachedRate(id)
-		if found {
-			rate := model.Rate{
-				InputSymbol: inputSymbol,
-				OutputToken: "inwstETH",
-				ProjectName: project,
-				PoolName:    poolName,
-				APY:         apy,
-				ProjectLink: scraper.InceptionProjectURL,
-				Points:      "Zircuit Points: 2; Mellow Points: 2; InceptionLRT Totems: 3; Symbiotic Points: 1",
-			}
-			rates = append(rates, rate)
-		}
-	}
-
-	// ezETH (renzo)
-	{
-		for _, inputSymbol := range []string{"ETH", "stETH"} {
-			id := "renzo:" + inputSymbol + ":renzo"
-			cachedAPY, _, found := scraperManager.GetCachedRate(id)
-			if found {
-				rate := model.Rate{
-					InputSymbol: inputSymbol,
-					OutputToken: "ezETH",
-					ProjectName: "renzo",
-					PoolName:    "renzo",
-					APY:         cachedAPY,
-					ProjectLink: "https://app.renzoprotocol.com",
-					Points:      "2x Zircuit Points",
-				}
-				rates = append(rates, rate)
-			}
-		}
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rates)
 }
