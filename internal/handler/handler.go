@@ -66,7 +66,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 				PoolName:    poolName,
 				APY:         apy,
 				ProjectLink: scraper.InceptionProjectURL,
-				Points:      "",
+				Points:      "Zircuit Points: 2; Mellow Points: 2; InceptionLRT Totems: 3; Symbiotic Points: 1",
 			}
 			rates = append(rates, rate)
 		}
