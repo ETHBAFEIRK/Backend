@@ -76,6 +76,14 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
+			// Lido
+			{
+				id := scraper.LidoID
+				rate, err := scraper.ScrapeLido()
+				if err == nil {
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
+				}
+			}
 			time.Sleep(10 * time.Minute)
 		}
 	}()
