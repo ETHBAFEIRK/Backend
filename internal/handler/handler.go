@@ -2,11 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"example.com/rates/v2/internal/app"
 	"example.com/rates/v2/internal/model"
 	"example.com/rates/v2/internal/scraper"
+	"fmt"
+	"net/http"
 )
 
 var scraperManager *app.ScraperManager
@@ -37,7 +37,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 	if found {
 		rate := model.Rate{
 			InputSymbol: inputSymbol,
-			OutputToken: "putETH",
+			OutputToken: "xpufETH",
 			ProjectName: project,
 			PoolName:    poolName,
 			APY:         apy,
