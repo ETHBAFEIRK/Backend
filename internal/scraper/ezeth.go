@@ -14,6 +14,7 @@ const (
 
 func ScrapeEzETH() []model.Rate {
 	log.Println("[scraper] Scraping (hardcoded) ezETH rates...")
+	points := "2x Zircuit Points; 2x Mellow Points; 3x InceptionLRT Totems; 1x Symbiotic Points"
 	return []model.Rate{
 		{
 			InputSymbol: "ETH",
@@ -22,7 +23,7 @@ func ScrapeEzETH() []model.Rate {
 			PoolName:    EzETHPool,
 			APY:         EzETHAPY,
 			ProjectLink: EzETHProjectURL,
-			Points:      "",
+			Points:      points,
 		},
 		{
 			InputSymbol: "stETH",
@@ -31,7 +32,7 @@ func ScrapeEzETH() []model.Rate {
 			PoolName:    EzETHPool,
 			APY:         EzETHAPY,
 			ProjectLink: EzETHProjectURL,
-			Points:      "",
+			Points:      points,
 		},
 	}
 }

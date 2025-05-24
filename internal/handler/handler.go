@@ -74,22 +74,18 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 
 	// ezETH (renzo)
 	{
-		project := "renzo"
-		poolName := "renzo"
-		projectLink := "https://app.renzoprotocol.com"
-
 		for _, inputSymbol := range []string{"ETH", "stETH"} {
-			id := project + ":" + inputSymbol + ":" + poolName
+			id := "renzo:" + inputSymbol + ":renzo"
 			cachedAPY, _, found := scraperManager.GetCachedRate(id)
 			if found {
 				rate := model.Rate{
 					InputSymbol: inputSymbol,
 					OutputToken: "ezETH",
-					ProjectName: project,
-					PoolName:    poolName,
+					ProjectName: "renzo",
+					PoolName:    "renzo",
 					APY:         cachedAPY,
-					ProjectLink: projectLink,
-					Points:      "",
+					ProjectLink: "https://app.renzoprotocol.com",
+					Points:      "2x Zircuit Points; 2x Mellow Points; 3x InceptionLRT Totems; 1x Symbiotic Points",
 				}
 				rates = append(rates, rate)
 			}
