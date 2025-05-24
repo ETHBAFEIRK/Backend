@@ -1,6 +1,9 @@
 package scraper
 
-import "example.com/rates/v2/internal/model"
+import (
+	"example.com/rates/v2/internal/model"
+	"log"
+)
 
 const (
 	EzETHProject    = "renzo"
@@ -11,6 +14,7 @@ const (
 
 // ScrapeRenzo returns hardcoded Renzo rates (ETH, WETH, wstETH -> pzETH at 2.86).
 func ScrapeRenzo() []model.Rate {
+	log.Println("[scraper] Scraping Inception...")
 
 	return []model.Rate{
 		{
@@ -20,6 +24,7 @@ func ScrapeRenzo() []model.Rate {
 			PoolName:    EzETHPool,
 			APY:         EzETHAPY,
 			ProjectLink: EzETHProjectURL,
+			OutputKind:  "stake",
 			Points:      "Zircuit Points: 2; ",
 		},
 		{
@@ -30,6 +35,7 @@ func ScrapeRenzo() []model.Rate {
 			APY:         EzETHAPY,
 			ProjectLink: EzETHProjectURL,
 			Points:      "Zircuit Points: 2; ",
+			OutputKind:  "stake",
 		},
 		{
 			InputSymbol: "ETH",
@@ -39,6 +45,7 @@ func ScrapeRenzo() []model.Rate {
 			APY:         2.86,
 			ProjectLink: "https://app.renzoprotocol.com/",
 			Points:      "Zircuit Points: 2; ",
+			OutputKind:  "stake",
 		},
 		{
 			InputSymbol: "WETH",
@@ -48,6 +55,7 @@ func ScrapeRenzo() []model.Rate {
 			APY:         2.86,
 			ProjectLink: "https://app.renzoprotocol.com/",
 			Points:      "Zircuit Points: 2; ",
+			OutputKind:  "stake",
 		},
 		{
 			InputSymbol: "wstETH",
@@ -57,6 +65,7 @@ func ScrapeRenzo() []model.Rate {
 			APY:         2.86,
 			ProjectLink: "https://app.renzoprotocol.com/",
 			Points:      "Zircuit Points: 2; ",
+			OutputKind:  "stake",
 		},
 	}
 }

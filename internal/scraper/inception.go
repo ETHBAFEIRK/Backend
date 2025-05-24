@@ -86,5 +86,6 @@ func ScrapeInception() (model.Rate, error) {
 		APY:         apy,
 		ProjectLink: InceptionProjectURL,
 		Points:      "Zircuit Points: 2; Mellow Points: 2; InceptionLRT Totems: 3; Symbiotic Points: 1",
+		OutputKind:  "restake",
 	}, nil
 }

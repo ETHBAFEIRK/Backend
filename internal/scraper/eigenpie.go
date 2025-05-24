@@ -26,9 +26,9 @@ type eigenpieAPIResponse struct {
 				Data    struct {
 					IsExpired bool `json:"isExpired"`
 					Data      []struct {
-						PoolId           int    `json:"poolId"`
-						PoolName         string `json:"poolName"`
-						StakeTokenInfo   struct {
+						PoolId         int    `json:"poolId"`
+						PoolName       string `json:"poolName"`
+						StakeTokenInfo struct {
 							Symbol string `json:"symbol"`
 						} `json:"stakeTokenInfo"`
 						ReceiptTokenInfo struct {
@@ -107,6 +107,7 @@ func ScrapeEigenpie() ([]model.Rate, error) {
 				APY:         apy,
 				ProjectLink: EigenpieProjectURL,
 				Points:      "Eigenpie Points: 1; EigenLayer Points: 1",
+				OutputKind:  "restake",
 			})
 		}
 	}
