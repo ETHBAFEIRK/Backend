@@ -77,7 +77,6 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		project := "renzo"
 		poolName := "renzo"
 		projectLink := "https://app.renzoprotocol.com"
-		apy := 3.77
 
 		for _, inputSymbol := range []string{"ETH", "stETH"} {
 			id := project + ":" + inputSymbol + ":" + poolName
