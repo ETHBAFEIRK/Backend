@@ -71,7 +71,7 @@ func ScrapeKelp() ([]model.Rate, error) {
 			PoolName:    KelpPool,
 			APY:         apiResp.TotalAPY,
 			ProjectLink: KelpProjectURL,
-			Points:      "Zircuit Points: 2",
+			Points:      "Zircuit Points: 2; Kelp Miles: 2; EigenLayer Points: 1",
 		})
 	}
 	return rates, nil

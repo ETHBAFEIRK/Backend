@@ -74,6 +74,6 @@ func ScrapeStakestone() (model.Rate, error) {
 		PoolName:    StakestonePool,
 		APY:         apy,
 		ProjectLink: StakestoneProjectURL,
-		Points:      "",
+		Points:      "Zircuit Points: 2; Stone Points: 2",
 	}, nil
 }
