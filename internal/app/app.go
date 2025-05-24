@@ -76,10 +76,6 @@ func NewScraperManager(dbPath string) *ScraperManager {
 	}
 }
 
-import (
-	"example.com/rates/v2/internal/model"
-)
-
 // Returns (model.Rate, lastScrape, found)
 func (sm *ScraperManager) GetCachedRate(id string) (model.Rate, time.Time, bool) {
 	row := sm.DB.QueryRow(`SELECT project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape FROM scrape_cache WHERE id = ?`, id)
