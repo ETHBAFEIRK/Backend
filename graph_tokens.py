@@ -9,19 +9,30 @@ def fetch_rates(url="http://localhost:8080/rates"):
 def build_mermaid_graph(rates):
     nodes = set()
     edges = []
+    # Map to store the highest APY for each target node (output token)
+    target_apy = {}
     for rate in rates:
         from_token = rate.get("input_symbol")
         to_token = rate.get("output_token")
         kind = rate.get("output_kind", "")
+        apy = rate.get("apy")
         nodes.add(from_token)
         nodes.add(to_token)
         label = kind if kind else ""
         # Escape quotes in label
         label = label.replace('"', '\\"')
         edges.append((from_token, to_token, label))
+        # Store the highest APY for each output token
+        if to_token not in target_apy or apy > target_apy[to_token]:
+            target_apy[to_token] = apy
     mermaid = ["graph TD"]
     for node in sorted(nodes):
-        mermaid.append(f'    {node}["{node}"]')
+        if node in target_apy:
+            apy_val = target_apy[node]
+            # Format APY to 2 decimal places, show as e.g. "wstETH (4.12%)"
+            mermaid.append(f'    {node}["{node} ({apy_val:.2f}%)"]')
+        else:
+            mermaid.append(f'    {node}["{node}"]')
     for from_token, to_token, label in edges:
         if label:
             mermaid.append(f'    {from_token} -->|{label}| {to_token}')
