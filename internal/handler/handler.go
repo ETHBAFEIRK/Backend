@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
-
 	"example.com/rates/v2/internal/app"
 	"example.com/rates/v2/internal/model"
 	"example.com/rates/v2/internal/scraper"
@@ -33,7 +31,7 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 	inputSymbol := scraper.PufferInput
 	poolName := scraper.PufferPool
 
-	apy, lastScrape, found := scraperManager.GetCachedRate(id)
+	apy, _, found := scraperManager.GetCachedRate(id)
 	var rates []model.Rate
 
 	if found {
