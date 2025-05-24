@@ -7,7 +7,6 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"example.com/rates/v2/internal/model"
 	"example.com/rates/v2/internal/scraper"
 )
 
