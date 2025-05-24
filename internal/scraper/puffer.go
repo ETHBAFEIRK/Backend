@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -25,9 +26,11 @@ type PufferAPIResponse struct {
 }
 
 func ScrapePuffer() (model.Rate, error) {
+	log.Println("[scraper] Scraping Puffer...")
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("GET", PufferAPI, nil)
 	if err != nil {
+		log.Printf("[scraper] Puffer: request error: %v", err)
 		return model.Rate{}, err
 	}
 	req.Header.Set("accept", "application/json, text/plain, */*")
@@ -37,27 +40,34 @@ func ScrapePuffer() (model.Rate, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Printf("[scraper] Puffer: HTTP error: %v", err)
 		return model.Rate{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
+		log.Printf("[scraper] Puffer: unexpected status: %d", resp.StatusCode)
 		return model.Rate{}, fmt.Errorf("unexpected status: %d", resp.StatusCode)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("[scraper] Puffer: read error: %v", err)
 		return model.Rate{}, err
 	}
 	var apiResp PufferAPIResponse
 	if err := json.Unmarshal(body, &apiResp); err != nil {
+		log.Printf("[scraper] Puffer: unmarshal error: %v", err)
 		return model.Rate{}, err
 	}
 	if apiResp.APY == "" {
+		log.Printf("[scraper] Puffer: apy not found in response")
 		return model.Rate{}, errors.New("apy not found in response")
 	}
 	var apy float64
 	if _, err := fmt.Sscanf(apiResp.APY, "%f", &apy); err != nil {
+		log.Printf("[scraper] Puffer: apy parse error: %v", err)
 		return model.Rate{}, err
 	}
+	log.Printf("[scraper] Puffer: APY scraped: %.4f", apy)
 	return model.Rate{
 		InputSymbol: PufferInput,
 		ProjectName: PufferProject,
