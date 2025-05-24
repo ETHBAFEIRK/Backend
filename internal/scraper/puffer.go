@@ -70,7 +70,7 @@ func ScrapePuffer() (model.Rate, error) {
 	log.Printf("[scraper] Puffer: APY scraped: %.4f", apy)
 	return model.Rate{
 		InputSymbol: PufferInput,
-		OutputToken: "putETH",
+		OutputToken: "xPufETH",
 		ProjectName: PufferProject,
 		PoolName:    PufferPool,
 		APY:         apy,
