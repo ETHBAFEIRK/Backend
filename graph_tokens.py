@@ -1,6 +1,6 @@
 import requests
 
-def fetch_rates(url="http://localhost:8000/rates"):
+def fetch_rates(url="http://localhost:8080/rates"):
     resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()
