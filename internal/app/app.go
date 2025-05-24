@@ -56,6 +56,14 @@ func (sm *ScraperManager) StartBackgroundScraping() {
 					_ = sm.SetCachedRateFull(id, rate, time.Now())
 				}
 			}
+			// Stakestone
+			{
+				id := scraper.StakestoneID
+				rate, err := scraper.ScrapeStakestone()
+				if err == nil {
+					_ = sm.SetCachedRateFull(id, rate, time.Now())
+				}
+			}
 			time.Sleep(10 * time.Minute)
 		}
 	}()
