@@ -79,15 +79,11 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add icons and kind to each rate
+	// Add icons to each rate, but do NOT override OutputKind (use saved kind from DB)
 	for i := range rates {
 		rates[i].FromIcon = tokenIcons[rates[i].InputSymbol]
 		rates[i].ToIcon = tokenIcons[rates[i].OutputToken]
-		if kind, ok := tokenKind[rates[i].OutputToken]; ok {
-			rates[i].OutputKind = kind
-		} else {
-			rates[i].OutputKind = ""
-		}
+		// OutputKind is already set from DB, do not override
 	}
 
 	// --- Begin: filter out isolated pairs ---
