@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"example.com/rates/v2/internal/app"
+	"example.com/rates/v2/internal/model"
 	"fmt"
 	"net/http"
 )
