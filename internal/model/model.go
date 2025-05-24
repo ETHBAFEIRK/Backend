@@ -1,3 +1,9 @@
 package model
 
-// Placeholder for data models
+type Rate struct {
+	InputSymbol string  `json:"input_symbol"`
+	ProjectName string  `json:"project_name"`
+	PoolName    string  `json:"pool_name"`
+	APY         float64 `json:"apy"`
+	ProjectLink string  `json:"project_link"`
+}
