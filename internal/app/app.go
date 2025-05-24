@@ -131,6 +131,7 @@ func (sm *ScraperManager) GetAllRates() ([]model.Rate, error) {
 }
 
 func (sm *ScraperManager) SetCachedRateFull(id string, rate model.Rate, t time.Time) error {
+	log.Printf("[db] Update: input=%s, output=%s, apy=%.4f", rate.InputSymbol, rate.OutputToken, rate.APY)
 	_, err := sm.DB.Exec(`
 		INSERT INTO scrape_cache (id, project, input_symbol, output_token, pool_name, apy, project_link, points, last_scrape)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
