@@ -29,11 +29,19 @@ def build_mermaid_graph(rates):
     return "\n".join(mermaid)
 
 def main():
+    import mermaid
     rates = fetch_rates()
     mermaid_graph = build_mermaid_graph(rates)
-    with open("tokens_graph.mmd", "w") as f:
+    mmd_path = "tokens_graph.mmd"
+    svg_path = "tokens_graph.svg"
+    with open(mmd_path, "w") as f:
         f.write(mermaid_graph)
     print("Mermaid graph written to tokens_graph.mmd")
+    # Render to SVG using mermaid-py
+    svg = mermaid.render(mermaid_graph, output_format="svg")
+    with open(svg_path, "w") as f:
+        f.write(svg)
+    print("SVG graph written to tokens_graph.svg")
 
 if __name__ == "__main__":
     main()
