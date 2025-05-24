@@ -4,10 +4,14 @@ import (
 	"log"
 	"net/http"
 
+	"example.com/rates/v2/internal/app"
 	"example.com/rates/v2/internal/handler"
 )
 
 func main() {
+	scraperManager := app.NewScraperManager("scrape_cache.db")
+	handler.InitScraperManager(scraperManager)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handler.Healthz)
 	mux.HandleFunc("/rates", handler.Rates)
